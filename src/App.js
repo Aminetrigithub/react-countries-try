@@ -1,12 +1,19 @@
 import './App.css';
-import CountriesList from './components/countries/CountriesList';
+import Counter from './components/counter/Counter';
+import CounterProvider from './context/CounterProvider';
+// import CountriesList from './components/countries/CountriesList';
 
 function App() {
   return (
   <>
+  <CounterProvider>
   <div className="container">
-    <CountriesList />
+    {/* <CountriesList /> */}
+    <Counter />
   </div>
+
+  </CounterProvider>
+  
   </>
   );
 }
