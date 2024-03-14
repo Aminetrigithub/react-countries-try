@@ -1,13 +1,17 @@
 import axios from "axios";
-import { useState,useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const CountriesList = () => {
   const [countries, setCountries] = useState([]);
-const [segment ,setSegment]=useState("all")
-  const searchInput = useRef("")
+  const [segment, setSegment] = useState("all");
+  const searchInput = useRef("");
+  const region = useRef("");
+
   const getCountries = async () => {
     try {
-      const result = await axios.get(`https://restcountries.com/v3.1/${segment}`);
+      const result = await axios.get(
+        `https://restcountries.com/v3.1/${segment}`
+      );
 
       if (result.status === 200) {
         setCountries(result.data);
@@ -17,21 +21,39 @@ const [segment ,setSegment]=useState("all")
     }
   };
 
-
   const searchCountries = async (e) => {
-  e.preventDefault();
-    let search = searchInput.current.value
-    if( search === ""){
-      alert("Please write something")
-    return
+    e.preventDefault();
+    let search = searchInput.current.value;
+    if (search === "") {
+      alert("Please write something");
+      return;
     }
-    setSegment(`name/${search}`)
-
+    setSegment(`name/${search}`);
   };
 
-  useEffect(() => { 
-    getCountries()
-   },[segment])
+  const searchByRegion = () => { 
+    let selectedRegion = region.current.value
+    if(selectedRegion === ""){
+      return 
+    }
+    setSegment(`region/${selectedRegion}`)
+   }
+  
+  const reset = () => {
+    searchInput.current.value = "";
+    region.current.value = "";
+    setSegment("all");
+  
+  };
+
+
+  useEffect(() => {
+    getCountries();
+  }, [segment]);
+
+
+
+
 
   return (
     <>
@@ -40,21 +62,42 @@ const [segment ,setSegment]=useState("all")
           <h1>List of Countries</h1>
         </div>
         <div className="col-md-4 text-right">
-    
-          <form className="d-flex "onSubmit={searchCountries}>
-        <input className="form-control me-sm-2" type="search" placeholder="Search" ref={searchInput}/>
-        <button className="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-        <button className="btn btn-danger my-2 my-sm-0" type="button">Reset</button>
-      </form>
-          
+          <form className="d-flex " onSubmit={searchCountries}>
+            <select className="form-control mr-2" ref={region} >
+              <option value="">Select region</option>
+              <option value="africa">Africa</option>
+              <option value="asia">Asia</option>
+              <option value="europe">Europe</option>
+              <option value="americas">Americas</option>
+              <option value="oceania">Oceania</option>
+            </select>
+            <input
+              className="form-control me-sm-2"
+              type="search"
+              placeholder="Search"
+              ref={searchInput}
+            />
+            <button className="btn btn-secondary my-2 my-sm-0" type="submit">
+              Search
+            </button>
+            {segment !== "all" ? (
+              <button
+                className="btn btn-danger my-2 my-sm-0"
+                onClick={reset}
+                type="button"
+              >
+                Reset
+              </button>
+            ) : (
+              ""
+            )}
+          </form>
         </div>
-    
       </div>
 
-
       <div className="row">
-        {countries.map(country => (
-          <div className="col-md-4">
+        {countries.map((country,index) => (
+          <div className="col-md-4" key={index}>
             <div className="card my-2">
               <img className="card-img-top" src={country.flags.png} alt="" />
               <div className="card-body">
@@ -63,13 +106,9 @@ const [segment ,setSegment]=useState("all")
                 <p className="card-text">Capital: {country.capital}</p>
               </div>
             </div>
-            
           </div>
-         ))}
+        ))}
       </div>
-    
-    
-    
     </>
   );
 };
